@@ -2,6 +2,8 @@ import express from 'express';
 import routes from './routes'
 import cors from 'cors';
 import path from 'path';
+import { errors } from 'celebrate';
+
 
 const app = express();
 //Dizendo para o express que o retorno das requisições serão feitas em JSON e o padrão será REST
@@ -25,4 +27,7 @@ app.use(routes);
 //Request body: Parâmetros para criação/atualização de informações
 
 app.use('/upload', express.static(path.resolve(__dirname, '..', 'upload')));
+
+app.use(errors());
+
 app.listen(3333);

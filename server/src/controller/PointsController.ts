@@ -21,7 +21,7 @@ class PointsController {
 
         const point = {
             name,
-            image: 'https://images.unsplash.com/photo-1573481078935-b9605167e06b?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60',
+            image: request.file.filename,
             email,
             whatsapp,
             latitude,
@@ -37,7 +37,10 @@ class PointsController {
         const point_id = insertedIds[0];
 
         //Utilização desses ids retornados para criar registros na tabela de relacionamento
-        const pointItems = items.map((itemId: number) => {
+        const pointItems = items
+        .split(',')
+        .map((item: string) => Number(item.trim()))
+        .map((itemId: number) => {
             return {
                 item_id: itemId,
                 point_id
@@ -69,7 +72,12 @@ class PointsController {
             .where('point_items.item_id', id)
             .select('items.title');
 
-        return response.json({ point, items });
+        const serializedPoint = {
+            ...point,
+            image_url: `http://192.168.2.51:3333/upload/${point.image}`
+        };
+
+        return response.json({ point: serializedPoint, items });
     }
 
     async index(request: Request, response: Response){
@@ -87,7 +95,14 @@ class PointsController {
             .distinct()
             .select('points.*');
 
-        return response.json(points)
+        const serializedPoints = points.map(point => {
+            return {
+                ...point,
+                image_url: `http://192.168.2.51:3333/upload/${point.image}`
+            };
+        });
+
+        return response.json(serializedPoints)
     }
 }
 
